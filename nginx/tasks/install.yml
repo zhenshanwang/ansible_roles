@@ -12,7 +12,7 @@
     createhome: no
     shell: /sbin/nologin
 
-- name: install pcre-devel
+- name: install pcre-devel 
   package:
     name: pcre-devel
     state: latest
@@ -27,10 +27,13 @@
     name: gcc*
     state: latest
 
-- name: create /opt/tools
+- name: create /opt/tools /var/log/nginx
   file:
-    path: /opt/tools
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /opt/tools
+    - /var/log/nginx
 
 - name: copy and extract nginx tar
   unarchive:
