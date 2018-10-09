@@ -52,10 +52,10 @@
   args:
     chdir: /opt/tools/{{ nginx_dir }} 
 
-#- name: modify nginx configuration 
-#  template:
-#    src: "{{ nginx_configuration }}"
-#    dest: /usr/local/{{ nginx_dir }}/conf/nginx.conf
+- name: modify nginx configuration 
+  template:
+    src: "{{ nginx_configuration }}"
+    dest: /usr/local/{{ nginx_dir }}/conf/nginx.conf
 
 - name: make link     #创建软连接，file模块
   file:
