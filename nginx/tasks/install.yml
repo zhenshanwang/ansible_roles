@@ -1,0 +1,69 @@
+---
+- name: groupadd nginx
+  group:
+    name: "{{ group }}"
+    gid: 888
+
+- name: useradd nginx
+  user:
+    name: "{{ user }}"
+    group: "{{ group }}"
+    uid: 888
+    createhome: no
+    shell: /sbin/nologin
+
+- name: install pcre-devel
+  package:
+    name: pcre-devel
+    state: latest
+
+- name: install openssl-devel
+  package:
+    name: openssl-devel
+    state: latest
+
+- name: install gcc
+  package:
+    name: gcc*
+    state: latest
+
+- name: create /opt/tools
+  file:
+    path: /opt/tools
+    state: directory
+
+- name: copy and extract nginx tar
+  unarchive:
+    src: "{{ tarbao_name }}"
+    dest: /opt/tools
+
+- name: ./configure
+  command: ./configure --user={{ user }} --group={{ group }} --prefix=/usr/local/{{ nginx_dir }} --with-http_stub_status_module --with-http_ssl_module
+  args:
+    chdir: /opt/tools/{{ nginx_dir }}
+
+- name: make
+  command: make
+  args:
+    chdir: /opt/tools/{{ nginx_dir }}
+
+- name: make install
+  command: make install
+  args:
+    chdir: /opt/tools/{{ nginx_dir }} 
+
+#- name: modify nginx configuration 
+#  template:
+#    src: "{{ nginx_configuration }}"
+#    dest: /usr/local/{{ nginx_dir }}/conf/nginx.conf
+
+- name: make link     #创建软连接，file模块
+  file:
+    src: /usr/local/{{ nginx_dir }}
+    dest: /usr/local/nginx
+    state: link
+
+- name: test nginx   #测试nginx配置,command模块
+  command: /usr/local/nginx/sbin/nginx -t
+  notify:              #调用handlers目录下的main.yml
+    - start nginx
